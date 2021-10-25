@@ -1,0 +1,203 @@
+
+CREATE TABLE "user_status_updates" (
+  "username" text,
+  "id" timeuuid,
+  "body" text,
+  PRIMARY KEY ("username", "id")
+);
+
+CREATE TABLE "users" (
+  "username" text,
+  "email" text,
+  "encrypted_password" blob,
+  PRIMARY KEY ("username")
+);
+
+INSERT INTO "user_status_updates"
+("username", "id", "body")
+VALUES (
+  'alice',
+  76e7a4d0-e796-11e3-90ce-5f98e903bf02,
+  'Learning Cassandra!'
+);
+
+INSERT INTO "user_status_updates"
+("username", "id", "body")
+VALUES (
+  'bob',
+  97719c50-e797-11e3-90ce-5f98e903bf02,
+  'Eating a tasty sandwich.'
+);
+
+SELECT * FROM "user_status_updates";
+
+SELECT "username", "id", "body", DATEOF("id")
+FROM "user_status_updates";
+
+SELECT "username", "id", "body", UNIXTIMESTAMPOF("id")
+FROM "user_status_updates";
+
+SELECT * FROM "user_status_updates"
+WHERE "username" = 'alice'
+AND "id" = 76e7a4d0-e796-11e3-90ce-5f98e903bf02;
+
+INSERT INTO "user_status_updates" ("username", "id", "body")
+
+VALUES ('alice', NOW(), 'Alice Update 1');
+INSERT INTO "user_status_updates" ("username", "id", "body")
+VALUES ('bob', NOW(), 'Bob Update 1');
+INSERT INTO "user_status_updates" ("username", "id", "body")
+VALUES ('alice', NOW(), 'Alice Update 2');
+INSERT INTO "user_status_updates" ("username", "id", "body")
+VALUES ('bob', NOW(), 'Bob Update 2');
+INSERT INTO "user_status_updates" ("username", "id", "body")
+VALUES ('alice', NOW(), 'Alice Update 3');
+INSERT INTO "user_status_updates" ("username", "id", "body")
+VALUES ('bob', NOW(), 'Bob Update 3');
+
+SELECT "username", "id", "body", UNIXTIMESTAMPOF("id")
+FROM "user_status_updates";
+
+CREATE TABLE "user_status_updates_by_datetime" (
+  "username" text,
+  "status_date" date,
+  "status_time" time,
+  "body" text,
+  PRIMARY KEY ("username", "status_date", "status_time")
+);
+
+INSERT INTO "user_status_updates_by_datetime" ("username", 
+"status_date", "status_time", "body")
+VALUES ('alice', '2016-11-18', '08:30:55.123', 'Alice Update 1');
+INSERT INTO "user_status_updates_by_datetime" ("username", 
+"status_date", "status_time", "body")
+VALUES ('alice', '2016-11-18', '14:40:25.123456789', 'Alice Update 2');
+INSERT INTO "user_status_updates_by_datetime" ("username", 
+"status_date", "status_time", "body")
+VALUES ('alice', '2016-11-19', '08:25:25', 'Alice Update 3');
+INSERT INTO "user_status_updates_by_datetime" ("username", 
+"status_date", "status_time", "body")
+VALUES ('alice', '2016-11-21', '08:35:55.123456', 'Alice Update 4');
+INSERT INTO "user_status_updates_by_datetime" ("username", 
+"status_date", "status_time", "body")
+VALUES ('alice', '2016-11-21', '14:30:15.123', 'Alice Update 5');
+INSERT INTO "user_status_updates_by_datetime" ("username", 
+"status_date", "status_time", "body")
+VALUES ('alice', '2016-11-23', '14:50:45.123456', 'Alice Update 6');
+
+INSERT INTO "user_status_updates_by_datetime" ("username", 
+"status_date", "status_time", "body")
+VALUES ('alice', '2016-14-23', '14:50:45.123456', 'Alice Update 7');
+
+INSERT INTO "user_status_updates_by_datetime" ("username", 
+"status_date", "status_time", "body")
+VALUES ('alice', '2016-11-23', '14:65:45.123456', 'Alice Update 8');
+
+SELECT * FROM "user_status_updates_by_datetime";
+
+SELECT * FROM "user_status_updates_by_datetime"
+   WHERE "username" = 'alice' AND "status_date" < '2016-11-20';
+
+SELECT * FROM "user_status_updates_by_datetime"
+   WHERE "username" = 'alice' AND "status_date" > '2016-11-20' AND 
+"status_time" > '12:00:00';
+
+SELECT * FROM "user_status_updates_by_datetime"
+   WHERE "username" = 'alice' AND "status_date" = '2016-11-18' AND 
+"status_time" > '12:00:00';
+
+
+SELECT * FROM "user_status_updates_by_datetime"
+   WHERE "username" = 'alice' AND "status_date" = '2016-11-21' AND 
+"status_time" > '12:00:00';
+
+CREATE TABLE "status_update_replies" (
+  "status_update_username" text,
+  "status_update_id" timeuuid,
+  "id" timeuuid,
+  "author_username" text,
+  "body" text,
+  PRIMARY KEY (
+    ("status_update_username", "status_update_id"),
+    "id"
+  )
+);
+
+INSERT INTO "status_update_replies" ("status_update_username", 
+"status_update_id", "id", "author_username", "body")
+VALUES ('alice', 76e7a4d0-e796-11e3-90ce-5f98e903bf02, NOW(), 'bob',
+'Reply1');
+
+INSERT INTO "status_update_replies" ("status_update_username", 
+"status_update_id", "id", "author_username", "body")
+VALUES ('alice', 97719c50-e797-11e3-90ce-5f98e903bf02, NOW(), 'bob',
+'Reply2');
+
+SELECT * FROM "status_update_replies"
+   WHERE "status_update_username" = 'alice';
+
+SELECT * FROM "status_update_replies"
+   WHERE "status_update_username" = 'alice' AND 
+"status_update_id" = 97719c50-e797-11e3-90ce-5f98e903bf02;
+
+CREATE TABLE "status_update_replies" (
+  "status_update_username" text,
+  "status_update_id" timeuuid,
+   "status_date" date,
+   "status_time" time,
+  "id" timeuuid,
+  "author_username" text,
+  "body" text,
+  PRIMARY KEY (
+    ("status_update_username", "status_update_id"),
+    "status_date", "status_time", "id"
+  )
+);
+
+CREATE TABLE "users_with_status_updates" (
+  "username" text,
+  "id" timeuuid,
+  "email" text STATIC,
+  "encrypted_password" blob STATIC,
+  "body" text,
+  PRIMARY KEY ("username", "id")
+);
+
+INSERT INTO "users_with_status_updates"
+("username", "id", "email", "encrypted_password", "body")
+VALUES (
+  'alice',
+  76e7a4d0-e796-11e3-90ce-5f98e903bf02,
+  'alice@gmail.com',
+  0x8914977ed729792e403da53024c6069a9158b8c4,
+  'Learning Cassandra!'
+);
+
+SELECT * FROM "users_with_status_updates";
+
+INSERT INTO "users_with_status_updates"
+("username", "id", "body")
+VALUES ('alice', NOW(), 'Another status update');
+
+SELECT * FROM "users_with_status_updates";
+
+SELECT "username", "email", "encrypted_password"
+FROM "users_with_status_updates"
+WHERE "username" = 'alice';
+
+SELECT DISTINCT "username", "email", "encrypted_password"
+FROM "users_with_status_updates"
+WHERE "username" = 'alice';
+
+INSERT INTO "users_with_status_updates"
+("username", "email", "encrypted_password")
+VALUES (
+  'bob',
+  'bob@gmail.com',
+  0x10920941a69549d33aaee6116ed1f47e19b8e713
+);
+
+INSERT INTO "users_with_status_updates"
+("username", "id", "body")
+VALUES ('bob', NOW(), 'Bob status update');
+

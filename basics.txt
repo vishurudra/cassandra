@@ -1,0 +1,52 @@
+CREATE TABLE posts (
+    userid text,
+    blog_title text,
+    posted_at timestamp,
+    entry_title text,
+    content text,
+    category int,
+    PRIMARY KEY (userid, blog_title, posted_at)
+)
+
+CREATE TABLE posts (
+    userid text,
+    blog_title text,
+    category int,
+    PRIMARY KEY (userid, blog_title)
+)
+
+The following query is allowed:
+
+SELECT entry_title, content FROM posts
+ WHERE userid = 'john doe'
+   AND blog_title='John''s Blog'
+   AND posted_at >= '2012-01-01' AND posted_at < '2012-01-31'
+But the following one is not, as it does not select a contiguous set of rows (and we suppose no secondary indexes are set):
+
+// Needs a blog_title to be set to select ranges of posted_at
+SELECT entry_title, content FROM posts
+ WHERE userid = 'john doe'
+   AND posted_at >= '2012-01-01' AND posted_at < '2012-01-31'
+When specifying relations, the TOKEN function can be used on the PARTITION KEY column to query. In that case, rows will be selected based on the token of their PARTITION_KEY rather than on the value. Note that the token of a key depends on the partitioner in use, and that in particular the RandomPartitioner won’t yield a meaningful order. Also note that ordering partitioners always order token values by bytes (so even if the partition key is of type int, token(-1) > token(0) in particular). Example:
+
+SELECT * FROM posts
+ WHERE token(userid) > token('tom') AND token(userid) < token('bob')
+Moreover, the IN relation is only allowed on the last column of the partition key and on the last column of the full primary key.
+
+It is also possible to “group” CLUSTERING COLUMNS together in a relation using the tuple notation. For instance:
+
+SELECT * FROM posts
+ WHERE userid = 'john doe'
+   AND (blog_title, posted_at) > ('John''s Blog', '2012-01-01')
+will request all rows that sorts after the one having “John’s Blog” as blog_tile and ‘2012-01-01’ for posted_at in the clustering order. In particular, rows having a post_at <= '2012-01-01' will be returned as long as their blog_title > 'John''s Blog', which would not be the case for:
+
+SELECT * FROM posts
+ WHERE userid = 'john doe'
+   AND blog_title > 'John''s Blog'
+   AND posted_at > '2012-01-01'
+The tuple notation may also be used for IN clauses on clustering columns:
+
+SELECT * FROM posts
+ WHERE userid = 'john doe'
+   AND (blog_title, posted_at) IN (('John''s Blog', '2012-01-01), ('Extreme Chess', '2014-06-01'))
+The CONTAINS operator may only

@@ -1,0 +1,1 @@
+CREATE TABLE server_logs_2(log_hour text ,log_level text,message text,server text ,PRIMARY KEY ((log_hour, server),log_level));

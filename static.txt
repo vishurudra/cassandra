@@ -1,0 +1,21 @@
+CREATE TABLE t (
+    pk int,
+    t int,
+    v text,
+    s text static,
+    PRIMARY KEY (pk, t)
+);
+
+INSERT INTO t (pk, t, v, s) VALUES (0, 0, 'val0', 'static0');
+INSERT INTO t (pk, t, v, s) VALUES (0, 1, 'val1', 'static1');
+INSERT INTO t (pk, t, v, s) VALUES (1, 0, 'val0', 'static2');
+INSERT INTO t (pk, t, v, s) VALUES (1, 1, 'val1', 'static3');
+SELECT * FROM t;
+   pk | t | v      | s
+  ----+---+--------+-----------
+   0  | 0 | 'val0' | 'static1'
+   0  | 1 | 'val1' | 'static1'
+
+a table without clustering columns cannot have static columns 
+(in a table without clustering columns, every partition has only one row, and so every column is inherently static).
+only non PRIMARY KEY columns can be static.

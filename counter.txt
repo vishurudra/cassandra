@@ -1,0 +1,27 @@
+Create table View_Counts 
+ (
+  count_view counter,
+  name varchar,
+  blog_name text,
+  primary key(name, blog_name)
+ ); 
+
+update View_counts set count_view = count_view+1 where name = 'Vishwa'and blog_name =  'cassandra';  
+
+update View_counts set count_view = count_view + 4 
+where name = 'Vishwa'and blog_name =  'cassandra';
+
+update View_counts set count_view = count_view - 4 
+where name = 'Vishwa'and blog_name =  'cassandra';  
+
+Create table user_view_Counts 
+ (
+  count_view counter,
+  name varchar,
+  blog_name text,
+  website text,
+  primary key(name, blog_name,website )
+ ); 
+
+
+When using counter, other than counter every one else should be part of primary key

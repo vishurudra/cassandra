@@ -1,0 +1,71 @@
+CREATE TABLE item_price (
+ store_number text,
+ item_id text,
+ price float,
+ replacements frozen<set<text>>,
+ product_code text,
+ PRIMARY KEY (store_number, item_id, price)
+) WITH CLUSTERING ORDER BY (item_id ASC, price ASC);
+
+
+INSERT INTO item_price ( store_number, item_id, price, replacements, product_code) VALUES ( ‘CA101’, ‘item101’, 1.50, {‘item101-r’, ‘item101-r2’}, ‘p101’);
+INSERT INTO item_price ( store_number, item_id, price, replacements, product_code) VALUES ( ‘CA102’, ‘item102’, 2.50, {‘item101-r’, ‘item102-r’}, ‘p102’);
+DELETE FROM item_price WHERE store_number = ‘CA102’;
+
+
+list ---continous ordered one
+set----duplicates are not allowed
+map: key value
+
+
+
+create table teacher
+(
+id int,
+name text,
+email set<text>,
+primary key(id)
+);
+insert into Teacher(id,name,email) values(1,'vishwa',
+{'abc@gmail.com','xyz@hotmail.com','abc@gmail.com'});
+
+alter table Teacher add course list<text>;
+insert into Teacher(id,Name,Email,course) values(2,'Hamilton',
+{'hamilton@hotmail.com'},['Data Science']);
+update teacher set course=course +['CP'] where id=2;
+
+
+create table course 
+(id int,
+ cm map<text,text>,
+ Primary key(id)
+ );
+insert into course(id,cm) values(1,{'eng':'english','mh':'maths'});
+
+ update course set cm =cm +{'h':'history'} where id=1;
+update course set cm =cm -{'h'} where id=1;
+
+
+
+
+
+
+create keyspace json with REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+create table books (isbn text primary key, title text, publisher text);
+
+insert into books JSON '{"isbn": "123", 
+"title": "The Magic Mountain",
+ "publisher": "Knofp"}';
+ 
+ 
+ use json;
+
+CREATE type sale ( id int, item text, amount int );
+
+CREATE TABLE customers ( id int  PRIMARY KEY, name text, balance int, sales list<FROZEN<sale>> );
+INSERT INTO customers (id, name, balance, sales) 
+VALUES (123, 'Greenville Hardware', 700,
+ [{ id: 5544, item : 'tape', amount : 100},
+  { id: 5545, item : 'wire', amount : 200}]) ;
+  
+  select id, toJson(sales) from customers;

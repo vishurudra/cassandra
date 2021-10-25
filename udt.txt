@@ -1,0 +1,30 @@
+CREATE TYPE Current_add
+(
+Emp_id int,
+h_no text,
+city text,
+state text,
+pin_code int,
+country text 
+); 
+
+CREATE TABLE Registration
+( 
+Emp_id int PRIMARY KEY, 
+Emp_Name text, 
+current_address FROZEN<Current_add>
+); 
+
+INSERT INTO Registration (Emp_id, Emp_Name, current_address ) 
+            values (1000, 'Ashish', { h_no :'A 210', city : 'delhi', state : 'DL', pin_code 
+                                    :12345, country :'IN'});
+
+INSERT INTO Registration(Emp_id, Emp_Name, current_address ) 
+            values (1001, 'kartikey Rana', { h_no : 'B 210 ',  city 
+                                    : 'mumbai', state : 'MH', pin_code 
+                                    :12345, country :'IN'});
+
+INSERT INTO Registration(Emp_id, Emp_Name, current_address ) 
+            values (1002, 'Dhruv Gupta', { h_no : 'C 210', city 
+                                    : 'delhi', state : 'DL', pin_code 
+                                    :12345, country :'IN'}); 

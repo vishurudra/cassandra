@@ -1,0 +1,47 @@
+docker run --name cas1 -p 9042:9042 -e CASSANDRA_CLUSTER_NAME=MyCluster  -e CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch -e CASSANDRA_DC=datacenter1 -d cassandra
+
+
+docker run --name cas2 -e CASSANDRA_SEEDS="172.17.0.2" -e CASSANDRA_CLUSTER_NAME=MyCluster -e CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch -e CASSANDRA_DC=datacenter1 -d cassandra
+docker run --name cas3 -e CASSANDRA_SEEDS="172.17.0.2" -e CASSANDRA_CLUSTER_NAME=MyCluster -e CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch -e CASSANDRA_DC=datacenter2  -d cassandra
+
+
+CREATE KEYSPACE mykeyspace WITH replication = {'class' : 'NetworkTopologyStrategy','datacenter1' : 1,'datacenter2' : 1};
+CREATE TABLE mykeyspace.mytable (id int primary key,name text);
+
+docker exec -ti cas1 nodetool status
+docker exec -ti cas1 cqlsh
+
+CREATE TABLE animals (name TEXT PRIMARY KEY,species TEXT,subspecies TEXT,genus TEXT,family TEXT);
+
+insert into animals (name,family, genus,species,subspecies)values('dog','Canidae','Canis','C. lupus','C. l. familiaris');
+ 
+insert into animals (name,family, genus,species,subspecies)values('cat','Felidae','Felis','F. catus ','C. l. familiaris');
+ 
+insert into animals (name,family, genus,species,subspecies)values('wolf','Canidae','Canis1','C. lupus',null);
+ 
+ CREATE TABLE animals (name TEXT,species TEXT,subspecies TEXT,genus TEXT,family TEXT,PRIMARY KEY(family, genus));
+ select family,token(family) from animals;
+ 
+docker exec -ti cas1 nodetool  getendpoints mykeyspace animals 'Canidae'
+docker exec -ti cas1 nodetool tablestats mykeyspace animals
+COLUMN stats cfstats
+tpstats thread tools
+A healthy system shows near zero at most times in all stages for both the Active and 
+Pending states
+The ReadStage and RequestResponseStage search data and return the results to the client.
+Some stages such as the AntiEntropyStage are entered by administrative actions such as 
+running nodetool repair.
+The FlushStage happens periodically when Memtables hit their thresholds and flush to disk. 
+Sustained non-zero values for active and pending inside this stage are rare. Since flushing 
+to disk is a serial operation, this would indicate an extremely overburdened disk subsystem.
+MutationStage is the stage that handles write operations. Because the write stage is highly 
+optimized, backlog in this stage would indicate either an extreme volume of write activity and 
+that the disk with the commit log cannot sustain the write traffic.
+Using nodetool cfstats to retrieve colu
+/nodetool repair Keyspace1 -h 192.168.1.7
+Data is stored in a memtable. To force a write of the data from the memtable to the
+SSTable on the filesystem, you can use the flush command on Nodetool, like this:
+bin/nodetool flush -h 192.168.1.1 -p 916
+
+$ bin/nodetool -h 192.168.1.5 snapshot
+$ bin/nodetool -h 192.168.1.5 snapshot Keyspace1

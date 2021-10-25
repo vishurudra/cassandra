@@ -1,0 +1,31 @@
+CREATE TABLE Emp_record
+ (
+  E_id int PRIMARY KEY,
+  E_score int,
+  E_name text,
+  E_city text
+ ); 
+
+INSERT INTO Emp_record(E_id, E_score, E_name, E_city) 
+       values (101, 85, ‘ashish’, ’Noida’);
+INSERT INTO Emp_record(E_id, E_score, E_name, E_city) 
+       values (102, 90, ‘ankur’, ’meerut’);
+INSERT INTO Emp_record(E_id, E_score, E_name, E_city) 
+       values (103, 99, ‘shivang’, ’gurugram’);
+INSERT INTO Emp_record(E_id, E_score, E_name, E_city) 
+       values (104, 85, ‘abi’, ’meerut’);
+INSERT INTO Emp_record(E_id, E_score, E_city) 
+       values (105, 95, ’mumbai’); 
+
+
+SELECT COUNT(*) 
+FROM Emp_record; 
+
+SELECT MAX(E_score) 
+FROM Emp_record; 
+
+SELECT SUM(E_score) 
+FROM Emp_record; 
+
+SELECT AVG(E_score) 
+FROM Emp_record; 

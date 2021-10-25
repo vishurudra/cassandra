@@ -1,0 +1,250 @@
+CREATE KEYSPACE IF NOT EXISTS testkeyspace
+ WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+drop keyspace testkeyspace;
+
+CREATE TABLE emp(
+   emp_id int PRIMARY KEY,
+   emp_name text,
+   emp_city text,
+   emp_sal varint,
+   emp_phone varint
+   );
+   INSERT INTO emp (emp_id, emp_city, emp_name, emp_phone, emp_sal) values(  4,'Pune','rajeev',9848022331, 30000);
+
+   ALTER TABLE emp ADD emp_email text;
+   ALTER TABLE emp DROP emp_email;
+    update emp set emp_email='v@gmail.com' where emp_id=4;
+   describe columnfamilies;
+   CREATE INDEX name ON emp (emp_name);
+   drop index name;
+   
+     INSERT INTO emp (emp_id, emp_city, emp_name, emp_phone, emp_sal) values(  3,'Pune','rajeev',9848022331, 30000);
+
+   INSERT INTO emp (emp_id, emp_city, emp_name, emp_phone, emp_sal) values(  2,'Pune','rajeev',9848022331, 30000);
+
+ BEGIN BATCH
+ INSERT INTO emp (emp_id, emp_city, emp_name, emp_phone, emp_sal) values(  5,'Pune','rajeev',9848022331, 30000);
+ UPDATE emp SET emp_sal = 50000 WHERE emp_id =3;
+ DELETE emp_city FROM emp WHERE emp_id = 2;
+ APPLY BATCH;
+ 
+ DELETE emp_sal FROM emp WHERE emp_id=3;
+ 
+ DELETE FROM emp WHERE emp_id=3;
+ 
+ CREATE TABLE data(name text PRIMARY KEY, email list<text>);
+ 
+ INSERT INTO data(name, email) VALUES ('ramu',['abc@gmail.com','cba@yahoo.com'])
+ 
+ UPDATE data SET email = email +['xyz@tutorialspoint.com'] where name = 'ramu';
+ 
+ 
+ 
+ INSERT INTO data2(name, phone)VALUES ('rahman',    {9848022338,9848022339});
+ 
+  UPDATE data2 SET phone = phone + {9848022330} where name = 'rahman';
+  
+  CREATE TABLE data3 (name text PRIMARY KEY, address map<text, text>);
+  
+  INSERT INTO data3 (name, address)VALUES ('robin', {'home' : 'hyderabad' , 'office' : 'Delhi' } );
+  
+  UPDATE data3 SET address = address+{'office':'mumbai'} WHERE name = 'robin';
+  
+  CREATE TYPE card_details (
+   num int,
+    pin int,
+    name text,
+    cvv int,
+    phone set<int> );
+
+
+
+describe  type card_details;
+
+ALTER TYPE card_details ADD email text;
+
+ALTER TYPE card_details RENAME email TO mail;
+
+CREATE TABLE events (
+ event_time timestamp,
+ url text,
+ event_id uuid,
+ network_location inet,
+ event_data text,
+ PRIMARY KEY ((url, event_time), event_id, network_location)) ;
+
+
+CREATE TABLE IF NOT EXISTS rank_by_year_and_name ( 
+  race_year int, 
+  race_name text, 
+  cyclist_name text, 
+  rank int, 
+  PRIMARY KEY ((race_year, race_name), rank) 
+);
+
+INSERT INTO events (
+ event_time,
+ url,
+ event_id,
+ network_location,
+ event_data
+) VALUES (
+ 1365977131666,
+ 'http://www.google.com',
+ now(),
+ '10.10.10.10',
+ '{"browser": "Firefox"}'
+) USING TTL 345600;
+
+
+SELECT *
+ FROM events
+ WHERE url='http://www.google.com'
+ AND event_time >1365977131666
+ and
+event_id= 8671b550-13b5-11ec-a209-9de9526e1bd0;
+
+
+
+
+CREATE TABLE IF NOT EXISTS cyclist_category ( 
+  category text, 
+  points int, 
+  id UUID, 
+  lastname text,     
+  PRIMARY KEY (category, points)
+)
+WITH CLUSTERING ORDER BY (points DESC);
+
+
+
+CREATE KEYSPACE books
+       WITH REPLICATION = { 'class' : 'NetworkTopologyStrategy', 'datacenter1' : 1};
+
+CREATE TABLE books (
+   isbn text,
+   title text,
+   author text,
+  publisher text,
+   category text,
+   PRIMARY KEY (isbn, author, publisher)
+);
+
+insert into books (isbn, title, author, publisher, category) values ('111', 'Fishing', 'Fred', 'Penguin Group', 'Sports');
+
+insert into books (isbn, title, author, publisher, category) values ('111', 'Sailing', 'Sally', 'Penguin Group', 'Sports');
+
+insert into books (isbn, title, author, publisher, category) values ('111', 'Archery', 'Fred', 'Penguin Group', 'Sports');
+
+insert into books (isbn, title, author, publisher, category) values ('111', 'Boating', 'Joe', 'Penguin Group', 'Sports');
+
+
+select token(isbn), isbn from books;
+
+insert into books (isbn, title, author, publisher, category) values ('333', 'Trees', 'Charles Darwin', 'Hachette', 'Nature');
+
+
+insert into books (isbn, title, author, publisher, category) values ('333', 'Trees', 'Charles Darwin', 'Amazon', 'Nature');
+
+
+
+drop table books;
+
+CREATE TABLE books (
+   isbn text,
+   title text,
+   author text,
+  publisher text,
+   category text,
+   PRIMARY KEY ((isbn, author), publisher)
+);
+
+insert into books (isbn, title, author, publisher, category) values ('111', 'Fishing', 'Fred', 'Penguin Group', 'Sports');
+
+insert into books (isbn, title, author, publisher, category) values ('111', 'Sailing', 'Sally', 'Penguin Group', 'Sports');
+
+insert into books (isbn, title, author, publisher, category) values ('111', 'Archery', 'Fred', 'Penguin Group', 'Sports');
+
+insert into books (isbn, title, author, publisher, category) values ('111', 'Boating', 'Joe', 'Penguin Group', 'Sports');
+
+select * from books where isbn='111' and author='Fred';
+ id---p
+
+batch
+
+....insert 
+  1
+2.......
+......1 million
+apply batch
+
+
+1)
+Batch not very 
+
+100....
+
+1000 records:
+
+10 ---partion
+begin batch
+......
+
+end
+
+
+begin batch
+.....
+
+
+
+-----10 records 
+
+
+
+1
+2   ------X --to be deleted ===Tombstone
+3
+
+cassandra -----grace period ====10 days
+
+
+
+0 seconds
+
+
+Distributed system
+
+		 1  2  3 
+delelte
+
+4 
+
+
+Consitency.......
+Eventual consistent
+
+
+keep deleted record
+
+
+marked for delete .........grace period
+
+
+grace 0 days
+
+
+
+
+1 2 3 4 
+
+1 2 3 4
+
+re
+
+
+setting ---database=====> settings
+
+
+
+
